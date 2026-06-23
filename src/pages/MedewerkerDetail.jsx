@@ -175,10 +175,14 @@ export default function MedewerkerDetail() {
   const { id } = useParams();
   const bron = getMedewerkerById(id);
 
-  const [profiel, setProfiel] = useState(null);
-  const [salaris, setSalaris] = useState(0);
-  const [competenties, setCompetenties] = useState([]);
-  const [gesprekkenLijst, setGesprekkenLijst] = useState([]);
+  const [profiel, setProfiel] = useState(() => (bron ? { ...bron } : null));
+  const [salaris, setSalaris] = useState(() => bron?.salaris ?? 0);
+  const [competenties, setCompetenties] = useState(
+    () => bron?.competenties.map((c) => ({ ...c })) ?? []
+  );
+  const [gesprekkenLijst, setGesprekkenLijst] = useState(() =>
+    bron ? getGesprekkenVoorMedewerker(id) : []
+  );
 
   const [profielBewerken, setProfielBewerken] = useState(false);
   const [profielDraft, setProfielDraft] = useState({});
@@ -204,7 +208,10 @@ export default function MedewerkerDetail() {
     setSalaris(bron.salaris);
     setCompetenties(bron.competenties.map((c) => ({ ...c })));
     setGesprekkenLijst(getGesprekkenVoorMedewerker(id));
-  }, [bron, id]);
+    setProfielBewerken(false);
+    setSalarisBewerken(false);
+    setLoonkloofWaarschuwing(false);
+  }, [id, bron]);
 
   const band = profiel ? getNiveauBand(profiel.niveau) : null;
   const gemNiveau = profiel ? getGemiddeldNiveau(profiel.niveau) : 0;
@@ -223,7 +230,7 @@ export default function MedewerkerDetail() {
     };
   }, [profiel, band, salaris, competenties]);
 
-  if (!bron) {
+  if (!bron || !profiel) {
     return (
       <div className="pagina">
         <TopNav />

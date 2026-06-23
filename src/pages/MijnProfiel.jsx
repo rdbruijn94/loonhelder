@@ -107,16 +107,16 @@ export default function MijnProfiel() {
             {formatter.format(salarisBand.max)}
           </p>
 
-          <div className="relative mt-8 md:mt-10">
+          <div className="relative mt-4 sm:mt-10">
             <div className="relative h-3 rounded-full bg-achtergrond">
               <div
-                className="absolute -top-7 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium md:text-xs"
+                className="absolute -top-7 hidden -translate-x-1/2 whitespace-nowrap text-xs font-medium sm:block"
                 style={{ left: `${eigenPositie}%`, color: "#3B7DD8" }}
               >
                 Jouw salaris
               </div>
               <div
-                className="absolute -top-7 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium text-gray-500 md:text-xs"
+                className="absolute -top-7 hidden -translate-x-1/2 whitespace-nowrap text-xs font-medium text-gray-500 sm:block"
                 style={{ left: `${gemPositie}%` }}
               >
                 Gemiddelde
@@ -130,27 +130,27 @@ export default function MijnProfiel() {
                 style={{ left: `${gemPositie}%` }}
               />
             </div>
-            <div className="mt-6 flex justify-between text-[10px] text-navy/50 md:text-xs">
+            <div className="mt-4 flex justify-between text-[10px] text-navy/50 sm:mt-6 md:text-xs">
               <span>{formatter.format(salarisBand.min)}</span>
               <span>{formatter.format(salarisBand.max)}</span>
             </div>
-          </div>
 
-          <div className="mt-4 flex flex-col gap-2 text-xs md:flex-row md:gap-6 md:text-sm">
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-block h-3 w-3 shrink-0 rounded-full"
-                style={{ backgroundColor: "#3B7DD8" }}
-              />
-              <span className="text-navy/70">
-                Jouw salaris: {formatter.format(medewerker.salaris)}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-3 w-3 shrink-0 rounded-full bg-gray-400" />
-              <span className="text-navy/70">
-                Gemiddelde: {formatter.format(gemiddeldVergelijkbaar)}
-              </span>
+            <div className="mt-4 flex flex-col gap-2 text-xs sm:hidden">
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-3 w-3 shrink-0 rounded-full"
+                  style={{ backgroundColor: "#3B7DD8" }}
+                />
+                <span className="text-navy/70">
+                  Jouw salaris: {formatter.format(medewerker.salaris)}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-3 w-3 shrink-0 rounded-full bg-gray-400" />
+                <span className="text-navy/70">
+                  Gemiddelde: {formatter.format(gemiddeldVergelijkbaar)}
+                </span>
+              </div>
             </div>
           </div>
 
