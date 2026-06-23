@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const navItems = [
   { pad: "/dashboard", label: "Dashboard" },
-  { pad: "/functiegroep", label: "Functiegroep" },
+  { pad: "/functiegroepen/1", label: "Functiegroep" },
   { pad: "/mijn-profiel", label: "Mijn profiel" },
 ];
 

@@ -10,7 +10,8 @@ export default function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/functiegroep" element={<Functiegroep />} />
+      <Route path="/functiegroepen/:id" element={<Functiegroep />} />
+      <Route path="/functiegroep" element={<Navigate to="/functiegroepen/1" replace />} />
       <Route path="/mijn-profiel" element={<MijnProfiel />} />
     </Routes>
   );

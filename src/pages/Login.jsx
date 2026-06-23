@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../data/mockdata";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
+  const [fout, setFout] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    navigate("/dashboard");
+    setFout("");
+
+    const account = login(email, wachtwoord);
+    if (account) {
+      navigate("/dashboard");
+    } else {
+      setFout("Onjuist e-mailadres of wachtwoord.");
+    }
   }
 
   return (
@@ -19,7 +28,7 @@ export default function Login() {
             Loon<span className="text-amber">Helder</span>
           </h1>
           <p className="mt-2 text-sm text-navy/60">
-            Inzicht in salaris en functiegroepen
+            Loontransparantie voor uw organisatie
           </p>
         </div>
 
@@ -54,6 +63,10 @@ export default function Login() {
             />
           </div>
 
+          {fout && (
+            <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{fout}</p>
+          )}
+
           <button
             type="submit"
             className="w-full rounded bg-amber py-2.5 font-semibold text-navy transition-colors hover:bg-amber/90"
@@ -61,6 +74,12 @@ export default function Login() {
             Inloggen
           </button>
         </form>
+
+        <div className="mt-6 rounded bg-achtergrond p-4 text-sm text-navy/70">
+          <p className="font-medium text-navy">Testaccounts</p>
+          <p className="mt-2">HR: hr@demo.nl / demo</p>
+          <p>Medewerker: medewerker@demo.nl / demo</p>
+        </div>
       </div>
     </div>
   );
