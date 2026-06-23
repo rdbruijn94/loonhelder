@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import BrandLogo from "../components/BrandLogo";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ export default function Login() {
     <div className="pagina flex items-center justify-center px-4">
       <div className="kaart w-full max-w-md p-6 shadow-lg md:p-8">
         <div className="mb-6 text-center md:mb-8">
-          <h1 className="text-2xl font-bold text-navy md:text-3xl">
-            Loon<span className="text-amber">Helder</span>
+          <h1 className="text-2xl md:text-3xl">
+            <BrandLogo variant="light" />
           </h1>
           <p className="mt-2 text-sm text-navy/60">
             Loontransparantie voor uw organisatie

@@ -44,14 +44,21 @@ function euro(bedrag) {
   }).format(bedrag);
 }
 
+function drawBrandName(doc, x, y, fontSize = 18) {
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(fontSize);
+  doc.setTextColor(255, 255, 255);
+  doc.text("Loon", x, y);
+  const loonWidth = doc.getTextWidth("Loon");
+  doc.setTextColor(...AMBER);
+  doc.text("transparant", x + loonWidth, y);
+}
+
 function drawHeader(doc) {
   doc.setFillColor(...NAVY);
   doc.rect(0, 0, PAGE_W, HEADER_H, "F");
 
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("LoonHelder", MARGIN, 14);
+  drawBrandName(doc, MARGIN, 14);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -74,7 +81,7 @@ function drawFooter(doc, pageNum, totalPages) {
 
   doc.setFontSize(8);
   doc.setTextColor(...GRIJS);
-  doc.text(`LoonHelder — Gegenereerd op ${vandaag()}`, MARGIN, footerY + 8);
+  doc.text(`Gegenereerd door Loontransparant — ${vandaag()}`, MARGIN, footerY + 8);
   doc.text(`Pagina ${pageNum} van ${totalPages}`, PAGE_W - MARGIN, footerY + 8, {
     align: "right",
   });
@@ -324,8 +331,8 @@ export function generateOnderbouwingPDF(type) {
   const datum = datumBestand();
   const filename =
     type === "intern"
-      ? `LoonHelder_Intern_Onderbouwing_Senior_${datum}.pdf`
-      : `LoonHelder_Extern_Rapport_Senior_${datum}.pdf`;
+      ? `Loontransparant_Intern_Onderbouwing_Senior_${datum}.pdf`
+      : `Loontransparant_Extern_Rapport_Senior_${datum}.pdf`;
 
   doc.save(filename);
 }
@@ -377,7 +384,7 @@ export function generateMedewerkerPDF(medewerker) {
 
   const datum = datumBestand();
   const slug = medewerker.naam.replace(/\s+/g, "_");
-  doc.save(`LoonHelder_Onderbouwing_${slug}_${datum}.pdf`);
+  doc.save(`Loontransparant_Onderbouwing_${slug}_${datum}.pdf`);
 }
 
 export function generateFunctieprofielPDF(profiel) {
@@ -442,5 +449,5 @@ export function generateFunctieprofielPDF(profiel) {
   drawFooter(doc, 1, 1);
 
   const datum = datumBestand();
-  doc.save(`LoonHelder_Functieprofiel_${datum}.pdf`);
+  doc.save(`Loontransparant_Functieprofiel_${datum}.pdf`);
 }

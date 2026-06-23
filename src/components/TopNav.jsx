@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import BrandLogo from "./BrandLogo";
 import { getUser, logout } from "../utils/auth";
 
 const hrNavItems = [
@@ -51,8 +52,8 @@ export default function TopNav() {
   return (
     <header className="bg-navy text-white shadow-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6 md:py-4">
-        <Link to={homePad} className="text-lg font-bold tracking-tight md:text-xl">
-          Loon<span className="text-amber">Helder</span>
+        <Link to={homePad} className="text-lg md:text-xl">
+          <BrandLogo variant="dark" />
         </Link>
 
         {user && (
@@ -116,9 +117,7 @@ export default function TopNav() {
           />
           <div className="absolute inset-x-0 top-0 max-h-full overflow-y-auto bg-white shadow-lg animate-[slideDown_0.2s_ease-out]">
             <div className="flex items-center justify-between border-b border-navy/10 px-4 py-4">
-              <span className="text-lg font-bold text-navy">
-                Loon<span className="text-amber">Helder</span>
-              </span>
+              <BrandLogo variant="light" className="text-lg" />
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
