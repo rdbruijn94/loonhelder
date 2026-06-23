@@ -4,7 +4,7 @@ const STORAGE_KEY = "loonhelder_user";
 
 const AuthContext = createContext(null);
 
-function loadUser() {
+export function getStoredUser() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
@@ -16,17 +16,34 @@ function loadUser() {
   }
 }
 
+function resolveRol(account) {
+  const email = account.email?.trim().toLowerCase();
+  if (email === "hr@demo.nl") return "hr";
+  if (email === "medewerker@demo.nl") return "medewerker";
+  return account.rol;
+}
+
+export function getHomeRoute(rol) {
+  return rol === "hr" ? "/dashboard" : "/mijn-profiel";
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(loadUser);
+  const [user, setUser] = useState(() => getStoredUser());
 
   function login(account) {
+    const rol = resolveRol(account);
     const sessionUser = {
-      email: account.email,
-      rol: account.rol,
+      email: account.email.trim().toLowerCase(),
+      rol,
       naam: `${account.voornaam} ${account.achternaam}`,
     };
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionUser));
     setUser(sessionUser);
+
+    console.log("[LoonHelder] Sessie opgeslagen:", sessionUser);
+    console.log("[LoonHelder] Rol na inloggen:", sessionUser.rol);
+
     return sessionUser;
   }
 

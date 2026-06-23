@@ -91,8 +91,11 @@ export function getFunctiegroep(id) {
 }
 
 export function authenticate(email, wachtwoord) {
+  const normalizedEmail = email.trim().toLowerCase();
   return accounts.find(
-    (a) => a.email === email && a.wachtwoord === wachtwoord
+    (a) =>
+      a.email.trim().toLowerCase() === normalizedEmail &&
+      a.wachtwoord === wachtwoord
   );
 }
 

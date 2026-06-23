@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getHomeRoute, useAuth } from "../context/AuthContext";
 import { authenticate } from "../data/mockdata";
 
 export default function Login() {
@@ -11,22 +11,21 @@ export default function Login() {
   const [fout, setFout] = useState("");
 
   if (user) {
-    return (
-      <Navigate
-        to={user.rol === "hr" ? "/dashboard" : "/mijn-profiel"}
-        replace
-      />
-    );
+    return <Navigate to={getHomeRoute(user.rol)} replace />;
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     setFout("");
 
-    const account = authenticate(email, wachtwoord);
+    const account = authenticate(email.trim(), wachtwoord);
     if (account) {
       const sessionUser = login(account);
-      navigate(sessionUser.rol === "hr" ? "/dashboard" : "/mijn-profiel");
+      const redirectPad = getHomeRoute(sessionUser.rol);
+
+      console.log("[LoonHelder] Redirect naar:", redirectPad, "voor rol:", sessionUser.rol);
+
+      navigate(redirectPad, { replace: true });
     } else {
       setFout("Onjuist e-mailadres of wachtwoord.");
     }
