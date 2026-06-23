@@ -4,7 +4,7 @@ import { functiegroepen, organisatie } from "../data/mockdata";
 
 export default function Functiegroepen() {
   return (
-    <div className="min-h-screen bg-achtergrond">
+    <div className="pagina">
       <TopNav />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
@@ -16,7 +16,7 @@ export default function Functiegroepen() {
             <Link
               key={groep.id}
               to={`/functiegroepen/${groep.id}`}
-              className="block rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="kaart block p-6 transition-shadow hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div>

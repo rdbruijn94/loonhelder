@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,32 +16,32 @@ export default function Login() {
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const ingevoerdEmail = email.trim().toLowerCase();
 
-    if (normalizedEmail === "hr@demo.nl") {
-      const user = { email: "hr@demo.nl", rol: "hr", naam: "HR Manager" };
-      localStorage.setItem("loonhelder_user", JSON.stringify(user));
+    if (ingevoerdEmail === "hr@demo.nl") {
+      localStorage.setItem(
+        "loonhelder_user",
+        JSON.stringify({ email: "hr@demo.nl", rol: "hr", naam: "HR Manager" })
+      );
       navigate("/dashboard");
-      return;
-    }
-
-    if (normalizedEmail === "medewerker@demo.nl") {
-      const user = {
-        email: "medewerker@demo.nl",
-        rol: "medewerker",
-        naam: "Lisa Jansen",
-      };
-      localStorage.setItem("loonhelder_user", JSON.stringify(user));
+    } else if (ingevoerdEmail === "medewerker@demo.nl") {
+      localStorage.setItem(
+        "loonhelder_user",
+        JSON.stringify({
+          email: "medewerker@demo.nl",
+          rol: "medewerker",
+          naam: "Lisa Jansen",
+        })
+      );
       navigate("/mijn-profiel");
-      return;
+    } else {
+      setFout("Onjuist e-mailadres of wachtwoord.");
     }
-
-    setFout("Onjuist e-mailadres of wachtwoord.");
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-achtergrond px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+    <div className="pagina flex items-center justify-center px-4">
+      <div className="kaart w-full max-w-md p-8 shadow-lg">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-navy">
             Loon<span className="text-amber">Helder</span>
@@ -93,6 +93,12 @@ export default function Login() {
             Inloggen
           </button>
         </form>
+
+        <p className="mt-4 text-center text-sm">
+          <Link to="/onboarding" className="font-medium text-navy hover:text-amber">
+            Nieuwe organisatie? Start de scan
+          </Link>
+        </p>
 
         <div className="mt-6 rounded bg-achtergrond p-4 text-sm text-navy/70">
           <p className="font-medium text-navy">Testaccounts</p>

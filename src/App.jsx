@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Functiegroepen from "./pages/Functiegroepen";
 import Functiegroep from "./pages/Functiegroep";
 import MijnProfiel from "./pages/MijnProfiel";
+import Onboarding from "./pages/Onboarding";
+import Resultaten from "./pages/Resultaten";
 
 export default function App() {
   return (
@@ -14,6 +16,8 @@ export default function App() {
       <Route path="/functiegroepen" element={<Functiegroepen />} />
       <Route path="/functiegroepen/:id" element={<Functiegroep />} />
       <Route path="/mijn-profiel" element={<MijnProfiel />} />
+      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/resultaten" element={<Resultaten />} />
       <Route path="/functiegroep" element={<Navigate to="/functiegroepen/1" replace />} />
     </Routes>
   );

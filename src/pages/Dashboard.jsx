@@ -10,7 +10,7 @@ function StatCard({ label, waarde, variant = "default" }) {
   };
 
   return (
-    <div className={`rounded-lg p-5 shadow-sm ${variants[variant]}`}>
+    <div className={`kaart p-5 ${variants[variant]}`}>
       <p className={`text-sm font-medium ${variant === "default" ? "text-navy/60" : ""}`}>
         {label}
       </p>
@@ -28,10 +28,25 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-achtergrond">
+    <div className="pagina">
       <TopNav />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
+        {organisatie.complianceScore < 70 && (
+          <div className="kaart mb-8 flex flex-wrap items-center justify-between gap-4 border-amber/30 bg-[#FFF7ED] p-4">
+            <p className="text-sm text-navy">
+              Jullie compliance-score is {organisatie.complianceScore}%. Verbeter jullie
+              score met de volwassenheidsscan.
+            </p>
+            <Link
+              to="/onboarding"
+              className="rounded bg-amber px-4 py-2 text-sm font-semibold text-navy hover:bg-amber/90"
+            >
+              Start scan
+            </Link>
+          </div>
+        )}
+
         <h1 className="text-2xl font-bold text-navy">Dashboard</h1>
         <p className="mt-1 text-navy/60">{organisatie.naam}</p>
 
@@ -57,7 +72,7 @@ export default function Dashboard() {
         <section className="mt-8">
           <Link
             to="/functiegroepen/1"
-            className="block rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+            className="kaart block p-6 transition-shadow hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">

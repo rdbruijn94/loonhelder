@@ -9,9 +9,13 @@ const formatter = new Intl.NumberFormat("nl-NL", {
 });
 
 function loonkloofKleur(percentage) {
-  if (percentage < 5) return { bg: "bg-green-50", text: "text-green-700", label: "Op orde" };
-  if (percentage <= 10) return { bg: "bg-[#FFF7ED]", text: "text-[#EA580C]", label: "Aandacht vereist" };
-  return { bg: "bg-[#FEF2F2]", text: "text-[#DC2626]", label: "Kritiek" };
+  if (percentage < 5) {
+    return { bg: "bg-green-50", text: "text-green-700", label: "Op orde" };
+  }
+  if (percentage > 10) {
+    return { bg: "bg-[#FEF2F2]", text: "text-[#DC2626]", label: "Kritiek" };
+  }
+  return { bg: "bg-[#FFF7ED]", text: "text-[#EA580C]", label: "Aandacht vereist" };
 }
 
 function niveauBadgeKleur(niveau) {
@@ -20,25 +24,29 @@ function niveauBadgeKleur(niveau) {
   return "bg-amber/20 text-amber";
 }
 
-function salarisPositie(salaris, band) {
-  return ((salaris - band.min) / (band.max - band.min)) * 100;
+function bandBreedte(salaris, band) {
+  const range = band.max - band.min;
+  if (range === 0) return 0;
+  return Math.min(100, Math.max(0, ((salaris - band.min) / range) * 100));
 }
 
 function SalarisBalk({ label, salaris, band, kleur }) {
-  const breedte = Math.min(100, Math.max(8, salarisPositie(salaris, band)));
+  const breedte = bandBreedte(salaris, band);
 
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-sm">
-        <span className="font-medium text-navy/70">{label}</span>
-      </div>
+      <div className="mb-1 text-sm font-medium text-navy/70">{label}</div>
       <div className="relative h-9 rounded bg-achtergrond">
         <div
           className={`absolute top-0 left-0 flex h-9 items-center rounded px-2 text-xs font-semibold text-white ${kleur}`}
-          style={{ width: `${breedte}%`, minWidth: "4.5rem" }}
+          style={{ width: `${breedte}%` }}
         >
           {formatter.format(salaris)}
         </div>
+      </div>
+      <div className="mt-1 flex justify-between text-xs text-navy/40">
+        <span>{formatter.format(band.min)}</span>
+        <span>{formatter.format(band.max)}</span>
       </div>
     </div>
   );
@@ -48,9 +56,11 @@ function NiveauKaart({ data }) {
   const loonkloof = loonkloofKleur(data.loonkloof);
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <div className="kaart p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${niveauBadgeKleur(data.niveau)}`}>
+        <span
+          className={`rounded-full px-3 py-1 text-sm font-semibold ${niveauBadgeKleur(data.niveau)}`}
+        >
           {data.niveau}
         </span>
         <span className="text-sm text-navy/50">
@@ -73,7 +83,9 @@ function NiveauKaart({ data }) {
         />
       </div>
 
-      <div className={`mt-4 inline-flex rounded-full px-3 py-1 text-sm font-medium ${loonkloof.bg} ${loonkloof.text}`}>
+      <div
+        className={`mt-4 inline-flex rounded-full px-3 py-1 text-sm font-medium ${loonkloof.bg} ${loonkloof.text}`}
+      >
         Loonkloof {data.loonkloof.toLocaleString("nl-NL")}% · {loonkloof.label}
       </div>
 
@@ -92,7 +104,9 @@ function NiveauKaart({ data }) {
         </div>
         <div className="rounded bg-achtergrond p-3">
           <p className="text-xs text-navy/50">Gem. vrouw</p>
-          <p className="mt-0.5 font-semibold text-vrouw">{formatter.format(data.vrouw.gemiddeld)}</p>
+          <p className="mt-0.5 font-semibold text-vrouw">
+            {formatter.format(data.vrouw.gemiddeld)}
+          </p>
         </div>
       </div>
     </div>
@@ -109,16 +123,16 @@ function Zijbalk({ groep }) {
 
   return (
     <aside className="space-y-6">
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="kaart p-6">
         <h3 className="font-semibold text-navy">Compliance-status</h3>
         <div className="mt-4 flex items-center gap-4">
           <div
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-[#DC2626] text-lg font-bold text-[#DC2626]"
+            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-[#DC2626]"
             style={{
               background: `conic-gradient(#DC2626 ${organisatie.complianceScore}%, #F0F2F5 0)`,
             }}
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-sm">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-sm font-bold text-[#DC2626]">
               {organisatie.complianceScore}%
             </span>
           </div>
@@ -139,7 +153,7 @@ function Zijbalk({ groep }) {
         </div>
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="kaart p-6">
         <h3 className="font-semibold text-navy">Genderverdeling per niveau</h3>
         <div className="mt-4 space-y-4">
           {groep.niveaus.map((n) => {
@@ -166,14 +180,14 @@ function Zijbalk({ groep }) {
         </div>
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="kaart p-6">
         <h3 className="font-semibold text-navy">Aandachtspunten</h3>
         <ul className="mt-4 space-y-3 text-sm">
           <li className="rounded bg-[#FEF2F2] px-3 py-2 text-[#DC2626]">
-            Senior loonkloof kritiek ({groep.niveaus[2].loonkloof}%)
+            Senior loonkloof kritiek ({groep.niveaus[2].loonkloof.toLocaleString("nl-NL")}%)
           </li>
           <li className="rounded bg-[#FFF7ED] px-3 py-2 text-[#EA580C]">
-            Junior loonkloof hoog ({groep.niveaus[0].loonkloof}%)
+            Junior loonkloof hoog ({groep.niveaus[0].loonkloof.toLocaleString("nl-NL")}%)
           </li>
         </ul>
       </div>
@@ -187,7 +201,7 @@ export default function Functiegroep() {
 
   if (!groep) {
     return (
-      <div className="min-h-screen bg-achtergrond">
+      <div className="pagina">
         <TopNav />
         <main className="mx-auto max-w-6xl px-6 py-8">
           <p className="text-navy">Functiegroep niet gevonden.</p>
@@ -200,7 +214,7 @@ export default function Functiegroep() {
   }
 
   return (
-    <div className="min-h-screen bg-achtergrond">
+    <div className="pagina">
       <TopNav />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
