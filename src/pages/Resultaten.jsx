@@ -25,28 +25,59 @@ export default function Resultaten() {
     <div className="pagina">
       <TopNav />
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <h1 className="text-2xl font-bold text-navy">Jouw compliance-rapport</h1>
-        <p className="mt-1 text-navy/60">
+      <main className="inhoud">
+        <h1 className="text-xl font-bold text-navy md:text-2xl">Jouw compliance-rapport</h1>
+        <p className="mt-1 text-sm text-navy/60 md:text-base">
           Op basis van jullie antwoorden hebben we de huidige situatie in kaart gebracht.
         </p>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <div className="kaart p-6">
+        <div className="mt-6 grid gap-3 md:mt-8 md:grid-cols-3 md:gap-4">
+          <div className="kaart p-4 md:p-6">
             <p className="text-sm font-medium text-[#DC2626]">Directe aandachtspunten</p>
-            <p className="mt-1 text-3xl font-bold text-[#DC2626]">{telling.rood}</p>
+            <p className="mt-1 text-2xl font-bold text-[#DC2626] md:text-3xl">{telling.rood}</p>
           </div>
-          <div className="kaart p-6">
+          <div className="kaart p-4 md:p-6">
             <p className="text-sm font-medium text-[#EA580C]">Punten die aandacht verdienen</p>
-            <p className="mt-1 text-3xl font-bold text-[#EA580C]">{telling.oranje}</p>
+            <p className="mt-1 text-2xl font-bold text-[#EA580C] md:text-3xl">{telling.oranje}</p>
           </div>
-          <div className="kaart p-6">
+          <div className="kaart p-4 md:p-6">
             <p className="text-sm font-medium text-green-700">Al op orde</p>
-            <p className="mt-1 text-3xl font-bold text-green-700">{telling.groen}</p>
+            <p className="mt-1 text-2xl font-bold text-green-700 md:text-3xl">{telling.groen}</p>
           </div>
         </div>
 
-        <div className="kaart mt-8 overflow-hidden">
+        <div className="mt-6 space-y-3 md:hidden">
+          {onderdelen.map((item) => (
+            <div key={item.id} className="kaart p-4">
+              <p className="font-medium text-navy">{item.naam}</p>
+              <span
+                className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusStyles[item.status].badge}`}
+              >
+                {statusStyles[item.status].label}
+              </span>
+              <div className="mt-3">
+                {item.status === "rood" && (
+                  <button
+                    type="button"
+                    className="min-h-11 w-full rounded bg-navy px-4 py-2 text-sm font-medium text-white"
+                  >
+                    {item.actieRood}
+                  </button>
+                )}
+                {item.status === "oranje" && (
+                  <button
+                    type="button"
+                    className="min-h-11 w-full rounded bg-navy px-4 py-2 text-sm font-medium text-white"
+                  >
+                    {item.actieOranje}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="kaart mt-6 hidden overflow-hidden md:mt-8 md:block">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-navy/10 bg-achtergrond">
               <tr>
@@ -70,7 +101,7 @@ export default function Resultaten() {
                     {item.status === "rood" && (
                       <button
                         type="button"
-                        className="rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
+                        className="min-h-11 rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
                       >
                         {item.actieRood}
                       </button>
@@ -78,7 +109,7 @@ export default function Resultaten() {
                     {item.status === "oranje" && (
                       <button
                         type="button"
-                        className="rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
+                        className="min-h-11 rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
                       >
                         {item.actieOranje}
                       </button>
@@ -90,8 +121,8 @@ export default function Resultaten() {
           </table>
         </div>
 
-        <div className="mt-8 rounded-[10px] bg-navy p-8 text-white">
-          <h2 className="text-xl font-semibold">
+        <div className="mt-6 rounded-[10px] bg-navy p-6 text-white md:mt-8 md:p-8">
+          <h2 className="text-lg font-semibold md:text-xl">
             Laat AI de ontbrekende documenten genereren
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-white/70">
@@ -100,14 +131,14 @@ export default function Resultaten() {
           </p>
           <button
             type="button"
-            className="mt-6 rounded bg-amber px-6 py-2.5 text-sm font-semibold text-navy hover:bg-amber/90"
+            className="mt-6 min-h-11 w-full rounded bg-amber px-6 py-3 text-sm font-semibold text-navy hover:bg-amber/90 md:w-auto md:py-2.5"
           >
             Bekijk wat AI kan genereren
           </button>
         </div>
 
         <p className="mt-6 text-center text-sm text-navy/50">
-          <Link to="/dashboard" className="text-amber hover:underline">
+          <Link to="/dashboard" className="inline-flex min-h-11 items-center text-amber hover:underline">
             Terug naar dashboard
           </Link>
         </p>

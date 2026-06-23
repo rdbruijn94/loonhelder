@@ -41,9 +41,9 @@ export default function Login() {
 
   return (
     <div className="pagina flex items-center justify-center px-4">
-      <div className="kaart w-full max-w-md p-8 shadow-lg">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-navy">
+      <div className="kaart w-full max-w-md p-6 shadow-lg md:p-8">
+        <div className="mb-6 text-center md:mb-8">
+          <h1 className="text-2xl font-bold text-navy md:text-3xl">
             Loon<span className="text-amber">Helder</span>
           </h1>
           <p className="mt-2 text-sm text-navy/60">
@@ -62,7 +62,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="naam@bedrijf.nl"
-              className="w-full rounded border border-navy/20 px-3 py-2 text-navy outline-none focus:border-amber focus:ring-1 focus:ring-amber"
+              className="min-h-11 w-full rounded border border-navy/20 px-3 py-2 text-navy outline-none focus:border-amber focus:ring-1 focus:ring-amber"
               required
             />
           </div>
@@ -77,7 +77,7 @@ export default function Login() {
               value={wachtwoord}
               onChange={(e) => setWachtwoord(e.target.value)}
               placeholder="Uw wachtwoord"
-              className="w-full rounded border border-navy/20 px-3 py-2 text-navy outline-none focus:border-amber focus:ring-1 focus:ring-amber"
+              className="min-h-11 w-full rounded border border-navy/20 px-3 py-2 text-navy outline-none focus:border-amber focus:ring-1 focus:ring-amber"
               required
             />
           </div>
@@ -88,14 +88,17 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full rounded bg-amber py-2.5 font-semibold text-navy transition-colors hover:bg-amber/90"
+            className="min-h-11 w-full rounded bg-amber py-3 font-semibold text-navy transition-colors hover:bg-amber/90"
           >
             Inloggen
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm">
-          <Link to="/onboarding" className="font-medium text-navy hover:text-amber">
+          <Link
+            to="/onboarding"
+            className="inline-flex min-h-11 items-center font-medium text-navy hover:text-amber"
+          >
             Nieuwe organisatie? Start de scan
           </Link>
         </p>
