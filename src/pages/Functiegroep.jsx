@@ -118,8 +118,8 @@ export default function Functiegroep() {
       <TopNav />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <Link to="/dashboard" className="text-sm text-navy/50 hover:text-navy">
-          Terug naar dashboard
+        <Link to="/functiegroepen" className="text-sm text-navy/50 hover:text-navy">
+          Terug naar functiegroepen
         </Link>
 
         <h1 className="mt-4 text-2xl font-bold text-navy">{groep.naam}</h1>

@@ -90,27 +90,35 @@ export function getFunctiegroep(id) {
   return functiegroepen.find((g) => g.id === Number(id));
 }
 
-export function getIngelogdeGebruiker() {
-  const raw = sessionStorage.getItem("loonhelder_user");
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-export function login(email, wachtwoord) {
-  const account = accounts.find(
+export function authenticate(email, wachtwoord) {
+  return accounts.find(
     (a) => a.email === email && a.wachtwoord === wachtwoord
   );
-  if (account) {
-    sessionStorage.setItem("loonhelder_user", JSON.stringify(account));
-    return account;
-  }
-  return null;
 }
 
-export function logout() {
-  sessionStorage.removeItem("loonhelder_user");
+export function getMedewerkerProfiel(email) {
+  const account = accounts.find(
+    (a) => a.email === email && a.rol === "medewerker"
+  );
+  return account ?? null;
 }
+
+export const medewerkers = functiegroepen.flatMap((groep) =>
+  groep.niveaus.flatMap((niveau) => {
+    const manEntries = Array.from({ length: niveau.man.aantal }, (_, i) => ({
+      id: `${groep.id}-${niveau.id}-m-${i + 1}`,
+      functiegroep: groep.naam,
+      niveau: niveau.naam,
+      geslacht: "man",
+      salaris: niveau.man.gemiddeldSalaris,
+    }));
+    const vrouwEntries = Array.from({ length: niveau.vrouw.aantal }, (_, i) => ({
+      id: `${groep.id}-${niveau.id}-v-${i + 1}`,
+      functiegroep: groep.naam,
+      niveau: niveau.naam,
+      geslacht: "vrouw",
+      salaris: niveau.vrouw.gemiddeldSalaris,
+    }));
+    return [...manEntries, ...vrouwEntries];
+  })
+);

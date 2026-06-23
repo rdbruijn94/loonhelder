@@ -1,31 +1,43 @@
 import { Navigate } from "react-router-dom";
 import TopNav from "../components/TopNav";
+import { useAuth } from "../context/AuthContext";
 import {
   functiegroepen,
   gemiddeldeNiveau,
-  getIngelogdeGebruiker,
+  getMedewerkerProfiel,
   salarisPositieInSchaal,
 } from "../data/mockdata";
 
 export default function MijnProfiel() {
-  const gebruiker = getIngelogdeGebruiker();
+  const { user } = useAuth();
 
-  if (!gebruiker || gebruiker.rol !== "medewerker") {
+  if (!user || user.rol !== "medewerker") {
     return <Navigate to="/login" replace />;
   }
 
-  const groep = functiegroepen.find((g) => g.id === gebruiker.functiegroepId);
-  const niveau = groep?.niveaus.find((n) => n.id === gebruiker.niveau);
+  const profiel = getMedewerkerProfiel(user.email);
+
+  if (!profiel) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const groep = functiegroepen.find((g) => g.id === profiel.functiegroepId);
+  const niveau = groep?.niveaus.find((n) => n.id === profiel.niveau);
   const schaal = niveau?.schaal;
-  const positie = schaal ? salarisPositieInSchaal(gebruiker.salaris, schaal) : 0;
+  const positie = schaal ? salarisPositieInSchaal(profiel.salaris, schaal) : 0;
   const collegaGemiddelde = niveau ? gemiddeldeNiveau(niveau) : 0;
-  const verschil = gebruiker.salaris - collegaGemiddelde;
+  const verschil = profiel.salaris - collegaGemiddelde;
 
   const formatter = new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
   });
+
+  const initialen = user.naam
+    .split(" ")
+    .map((deel) => deel[0])
+    .join("");
 
   return (
     <div className="min-h-screen bg-achtergrond">
@@ -40,22 +52,19 @@ export default function MijnProfiel() {
         <div className="mt-8 grid gap-8 lg:grid-cols-3">
           <div className="rounded-lg bg-white p-6 shadow-sm lg:col-span-1">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-navy text-2xl font-bold text-white">
-              {gebruiker.voornaam[0]}
-              {gebruiker.achternaam[0]}
+              {initialen}
             </div>
-            <h2 className="mt-4 text-xl font-semibold text-navy">
-              {gebruiker.voornaam} {gebruiker.achternaam}
-            </h2>
-            <p className="text-sm text-navy/60">{gebruiker.email}</p>
-            <p className="mt-3 font-medium text-navy">{gebruiker.functie}</p>
-            <p className="mt-1 text-sm text-navy/50">{gebruiker.afdeling}</p>
+            <h2 className="mt-4 text-xl font-semibold text-navy">{user.naam}</h2>
+            <p className="text-sm text-navy/60">{user.email}</p>
+            <p className="mt-3 font-medium text-navy">{profiel.functie}</p>
+            <p className="mt-1 text-sm text-navy/50">{profiel.afdeling}</p>
           </div>
 
           <div className="rounded-lg bg-navy p-6 text-white shadow-sm lg:col-span-2">
             <h2 className="text-lg font-semibold">Uw salaris</h2>
             <p className="mt-1 text-sm text-white/60">Bruto maandsalaris</p>
             <p className="mt-2 text-3xl font-bold text-amber">
-              {formatter.format(gebruiker.salaris)}
+              {formatter.format(profiel.salaris)}
             </p>
           </div>
         </div>
@@ -70,10 +79,7 @@ export default function MijnProfiel() {
 
             <div className="relative mt-6">
               <div className="h-10 rounded-lg bg-achtergrond">
-                <div
-                  className="absolute top-0 h-10 rounded-lg bg-vrouw/30"
-                  style={{ left: 0, right: 0 }}
-                />
+                <div className="absolute top-0 h-10 w-full rounded-lg bg-vrouw/30" />
                 <div
                   className="absolute top-1/2 h-5 w-1 -translate-y-1/2 rounded bg-navy"
                   style={{ left: `${positie}%`, marginLeft: "-2px" }}
@@ -82,7 +88,7 @@ export default function MijnProfiel() {
                   className="absolute -top-8 -translate-x-1/2 rounded bg-navy px-2 py-0.5 text-xs font-semibold text-white"
                   style={{ left: `${positie}%` }}
                 >
-                  {formatter.format(gebruiker.salaris)}
+                  {formatter.format(profiel.salaris)}
                 </div>
               </div>
               <div className="mt-2 flex justify-between text-xs text-navy/50">

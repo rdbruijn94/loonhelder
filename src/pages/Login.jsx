@@ -1,20 +1,32 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../data/mockdata";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { authenticate } from "../data/mockdata";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { user, login } = useAuth();
   const [email, setEmail] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
   const [fout, setFout] = useState("");
+
+  if (user) {
+    return (
+      <Navigate
+        to={user.rol === "hr" ? "/dashboard" : "/mijn-profiel"}
+        replace
+      />
+    );
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
     setFout("");
 
-    const account = login(email, wachtwoord);
+    const account = authenticate(email, wachtwoord);
     if (account) {
-      navigate("/dashboard");
+      const sessionUser = login(account);
+      navigate(sessionUser.rol === "hr" ? "/dashboard" : "/mijn-profiel");
     } else {
       setFout("Onjuist e-mailadres of wachtwoord.");
     }
