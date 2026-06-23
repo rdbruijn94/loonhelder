@@ -19,6 +19,25 @@ function StatCard({ label, waarde, variant = "default" }) {
   );
 }
 
+function ActieRij({ kleur, tekst, knopLabel, naar }) {
+  const dotKleur = kleur === "rood" ? "bg-[#DC2626]" : "bg-[#EA580C]";
+
+  return (
+    <div className="flex flex-col gap-3 border-b border-navy/10 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3">
+        <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotKleur}`} />
+        <p className="text-sm text-navy">{tekst}</p>
+      </div>
+      <Link
+        to={naar}
+        className="min-h-11 shrink-0 rounded bg-navy px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-navy/90 sm:min-w-[120px]"
+      >
+        {knopLabel}
+      </Link>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const groep = functiegroepen[0];
   const formatter = new Intl.NumberFormat("nl-NL", {
@@ -94,6 +113,30 @@ export default function Dashboard() {
               </span>
             </div>
           </Link>
+        </section>
+
+        <section className="kaart mt-6 p-4 md:mt-8 md:p-6">
+          <h2 className="text-base font-semibold text-navy md:text-lg">Vereiste acties</h2>
+          <div className="mt-2">
+            <ActieRij
+              kleur="rood"
+              tekst="Senior loonkloof 14,2% vereist schriftelijke onderbouwing"
+              knopLabel="Genereer nu"
+              naar="/functiegroepen/1?modal=senior"
+            />
+            <ActieRij
+              kleur="oranje"
+              tekst="Junior loonkloof 6,8% — controleer op objectieve verklaring"
+              knopLabel="Bekijk"
+              naar="/functiegroepen/1"
+            />
+            <ActieRij
+              kleur="oranje"
+              tekst="2 medewerkers zonder actuele competentiebeoordeling"
+              knopLabel="Bekijk"
+              naar="/functiegroepen/1"
+            />
+          </div>
         </section>
       </main>
     </div>

@@ -1,6 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import TopNav from "../components/TopNav";
-import { functiegroepen, organisatie } from "../data/mockdata";
+import { functiegroepen, organisatie, seniorMedewerkers } from "../data/mockdata";
 
 const formatter = new Intl.NumberFormat("nl-NL", {
   style: "currency",
@@ -52,11 +53,37 @@ function SalarisBalk({ label, salaris, band, kleur }) {
   );
 }
 
-function NiveauKaart({ data }) {
+function LoonkloofActie({ loonkloof, onGenereer, onBekijk }) {
+  if (loonkloof < 5) return null;
+
+  if (loonkloof > 10) {
+    return (
+      <button
+        type="button"
+        onClick={onGenereer}
+        className="mt-4 min-h-11 rounded bg-navy px-4 py-2 text-sm font-medium text-white hover:bg-navy/90"
+      >
+        Genereer onderbouwing
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onBekijk}
+      className="mt-4 min-h-11 rounded border-2 border-navy px-4 py-2 text-sm font-medium text-navy hover:bg-navy/5"
+    >
+      Bekijk onderbouwing
+    </button>
+  );
+}
+
+function NiveauKaart({ data, id, onGenereerOnderbouwing, onBekijkOnderbouwing }) {
   const loonkloof = loonkloofKleur(data.loonkloof);
 
   return (
-    <div className="kaart w-full p-4 md:p-6">
+    <div id={id} className="kaart w-full p-4 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <span
           className={`rounded-full px-3 py-1 text-sm font-semibold ${niveauBadgeKleur(data.niveau)}`}
@@ -89,6 +116,12 @@ function NiveauKaart({ data }) {
         Loonkloof {data.loonkloof.toLocaleString("nl-NL")}% · {loonkloof.label}
       </div>
 
+      <LoonkloofActie
+        loonkloof={data.loonkloof}
+        onGenereer={onGenereerOnderbouwing ?? (() => {})}
+        onBekijk={onBekijkOnderbouwing ?? (() => {})}
+      />
+
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         <div className="rounded bg-achtergrond p-3">
           <p className="text-xs text-navy/50">Mannen</p>
@@ -109,6 +142,114 @@ function NiveauKaart({ data }) {
           <p className="mt-0.5 text-sm font-semibold text-vrouw md:text-base">
             {formatter.format(data.vrouw.gemiddeld)}
           </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MedewerkerKolom({ persoon }) {
+  const isMan = persoon.geslacht === "man";
+
+  return (
+    <div className="kaart p-4 md:p-5">
+      <h3 className="font-semibold text-navy">{persoon.naam}</h3>
+      <p className={`mt-1 text-sm ${isMan ? "text-man" : "text-vrouw"}`}>
+        {isMan ? "Man" : "Vrouw"} · {formatter.format(persoon.salaris)}
+      </p>
+      <dl className="mt-4 space-y-2 text-sm">
+        <div className="flex justify-between">
+          <dt className="text-navy/60">Ervaringsjaren</dt>
+          <dd className="font-medium text-navy">{persoon.ervaringsjaren}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt className="text-navy/60">Beoordeling</dt>
+          <dd className="font-medium text-navy">{persoon.beoordelingResultaat}</dd>
+        </div>
+      </dl>
+      <ul className="mt-4 space-y-2 text-sm">
+        {persoon.competenties.map((c) => {
+          const onderVereist = c.huidigNiveau < c.vereistNiveau;
+          return (
+            <li
+              key={c.naam}
+              className={`flex justify-between ${onderVereist ? "text-[#DC2626]" : "text-navy"}`}
+            >
+              <span>{c.naam}</span>
+              <span className="font-medium">Niveau {c.huidigNiveau}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <span className="mt-4 inline-flex rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+        Salarispositie objectief onderbouwd
+      </span>
+    </div>
+  );
+}
+
+function SeniorOnderbouwingModal({ open, onClose }) {
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  const [thomas, sandra] = seniorMedewerkers;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 md:items-center md:p-4">
+      <div className="absolute inset-0 bg-navy/50" onClick={onClose} aria-hidden="true" />
+      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-[10px] bg-white md:max-w-4xl md:rounded-[10px]">
+        <div className="sticky top-0 flex items-center justify-between border-b border-navy/10 bg-white px-4 py-4 md:px-6">
+          <div>
+            <h2 className="text-lg font-bold text-navy md:text-xl">
+              Onderbouwing loonverschil — Senior Assurantieadviseur
+            </h2>
+            <p className="mt-1 text-sm text-navy/60">
+              Automatisch gegenereerd op basis van competentie- en ervaringsdata
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-4 flex min-h-11 min-w-11 items-center justify-center text-2xl text-navy"
+            aria-label="Sluiten"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="grid gap-4 p-4 md:grid-cols-2 md:p-6">
+          <MedewerkerKolom persoon={thomas} />
+          <MedewerkerKolom persoon={sandra} />
+        </div>
+
+        <div className="border-t border-navy/10 p-4 md:p-6">
+          <p className="text-sm leading-relaxed text-navy/70">
+            Het loonverschil van 14,2% is verklaarbaar op basis van ervaringsverschil (8 vs 4
+            jaar) en competentiescores. Thomas Bakker scoort op alle competenties niveau 4,
+            Sandra Visser scoort op Productkennis en Probleemoplossend vermogen nog niveau 2.
+            Dit verschil is objectief en niet gebaseerd op geslacht.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              className="min-h-11 flex-1 rounded bg-amber px-4 py-3 text-sm font-semibold text-navy hover:bg-amber/90"
+            >
+              Download als PDF
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="min-h-11 flex-1 rounded bg-gray-200 px-4 py-3 text-sm font-medium text-navy hover:bg-gray-300"
+            >
+              Sluit
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -199,7 +340,26 @@ function Zijbalk({ groep }) {
 
 export default function Functiegroep() {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [seniorModalOpen, setSeniorModalOpen] = useState(false);
+
   const groep = functiegroepen.find((g) => g.id === Number(id));
+
+  useEffect(() => {
+    if (searchParams.get("modal") === "senior") {
+      setSeniorModalOpen(true);
+    }
+  }, [searchParams]);
+
+  function openSeniorModal() {
+    setSeniorModalOpen(true);
+    setSearchParams({ modal: "senior" });
+  }
+
+  function closeSeniorModal() {
+    setSeniorModalOpen(false);
+    setSearchParams({});
+  }
 
   if (!groep) {
     return (
@@ -234,9 +394,24 @@ export default function Functiegroep() {
         </p>
 
         <div className="mt-6 flex flex-col gap-6 md:mt-8 md:gap-8 lg:grid lg:grid-cols-3">
-          <div className="order-1 space-y-4 md:space-y-6 lg:order-1 lg:col-span-2">
+          <div className="order-1 space-y-4 md:space-y-6 lg:col-span-2">
             {groep.niveaus.map((niveau) => (
-              <NiveauKaart key={niveau.niveau} data={niveau} />
+              <NiveauKaart
+                key={niveau.niveau}
+                id={niveau.niveau === "Junior" ? "junior-niveau" : undefined}
+                data={niveau}
+                onGenereerOnderbouwing={
+                  niveau.niveau === "Senior" ? openSeniorModal : undefined
+                }
+                onBekijkOnderbouwing={
+                  niveau.niveau === "Junior"
+                    ? () =>
+                        document
+                          .getElementById("junior-niveau")
+                          ?.scrollIntoView({ behavior: "smooth" })
+                    : undefined
+                }
+              />
             ))}
           </div>
           <div className="order-2 lg:order-2">
@@ -244,6 +419,8 @@ export default function Functiegroep() {
           </div>
         </div>
       </main>
+
+      <SeniorOnderbouwingModal open={seniorModalOpen} onClose={closeSeniorModal} />
     </div>
   );
 }
