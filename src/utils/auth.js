@@ -1,15 +1,12 @@
-const STORAGE_KEY = "loonhelder_user";
-
-export function getUser() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
+export const getUser = () => {
   try {
-    return JSON.parse(raw);
+    return JSON.parse(localStorage.getItem("loonhelder_user"));
   } catch {
     return null;
   }
-}
+};
 
-export function logout() {
-  localStorage.removeItem(STORAGE_KEY);
-}
+export const logout = () => {
+  localStorage.removeItem("loonhelder_user");
+  window.location.href = "/login";
+};

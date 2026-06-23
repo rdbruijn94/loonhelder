@@ -1,133 +1,55 @@
 export const organisatie = {
   naam: "Verzekeraar De Amstel",
-  totaalMedewerkers: 18,
-  aantalFunctiegroepen: 1,
+  sector: "Verzekeringen",
+  medewerkers: 18,
+  complianceScore: 61,
+  loonkloof: 8.4,
+  gemiddeldSalaris: 3840,
 };
-
-export const accounts = [
-  {
-    email: "hr@demo.nl",
-    wachtwoord: "demo",
-    rol: "hr",
-    voornaam: "Mark",
-    achternaam: "Bakker",
-  },
-  {
-    email: "medewerker@demo.nl",
-    wachtwoord: "demo",
-    rol: "medewerker",
-    voornaam: "Lisa",
-    achternaam: "Jansen",
-    functie: "Medior Assurantieadviseur",
-    niveau: "medior",
-    functiegroepId: 1,
-    salaris: 3460,
-    geslacht: "vrouw",
-    afdeling: "Schade",
-    dienstverband: "Vast",
-    fte: 1.0,
-  },
-];
 
 export const functiegroepen = [
   {
     id: 1,
     naam: "Assurantieadviseur",
+    schaal: "5-8",
     niveaus: [
       {
-        id: "junior",
-        naam: "Junior",
-        schaal: { min: 2600, max: 3100 },
-        man: { aantal: 4, gemiddeldSalaris: 2920 },
-        vrouw: { aantal: 2, gemiddeldSalaris: 2720 },
+        niveau: "Junior",
+        schaal: "5",
+        salarisBand: { min: 2600, max: 3100 },
+        man: { aantal: 4, gemiddeld: 2920 },
+        vrouw: { aantal: 2, gemiddeld: 2720 },
+        loonkloof: 6.8,
       },
       {
-        id: "medior",
-        naam: "Medior",
-        schaal: { min: 3100, max: 3800 },
-        man: { aantal: 4, gemiddeldSalaris: 3580 },
-        vrouw: { aantal: 4, gemiddeldSalaris: 3460 },
+        niveau: "Medior",
+        schaal: "6-7",
+        salarisBand: { min: 3100, max: 3800 },
+        man: { aantal: 4, gemiddeld: 3580 },
+        vrouw: { aantal: 4, gemiddeld: 3460 },
+        loonkloof: 3.2,
       },
       {
-        id: "senior",
-        naam: "Senior",
-        schaal: { min: 3800, max: 4800 },
-        man: { aantal: 2, gemiddeldSalaris: 4480 },
-        vrouw: { aantal: 2, gemiddeldSalaris: 3840 },
+        niveau: "Senior",
+        schaal: "8",
+        salarisBand: { min: 3800, max: 4800 },
+        man: { aantal: 2, gemiddeld: 4480 },
+        vrouw: { aantal: 2, gemiddeld: 3840 },
+        loonkloof: 14.2,
       },
     ],
   },
 ];
 
-export const compliance = {
-  totaalMedewerkers: 18,
-  gemiddeldSalaris: 3840,
-  loonkloof: 8.4,
-  complianceScore: 61,
-  laatsteUpdate: "2026-03-01",
+export const medewerker = {
+  naam: "Lisa Jansen",
+  email: "medewerker@demo.nl",
+  functie: "Medior Assurantieadviseur",
+  salaris: 3460,
+  geslacht: "vrouw",
+  niveauData: {
+    niveau: "Medior",
+    salarisBand: { min: 3100, max: 3800 },
+    gemiddeldVergelijkbaar: 3520,
+  },
 };
-
-export function berekenLoonkloof(manSalaris, vrouwSalaris) {
-  if (manSalaris === 0) return 0;
-  return Math.round(((manSalaris - vrouwSalaris) / manSalaris) * 1000) / 10;
-}
-
-export function loonkloofKleur(percentage) {
-  if (percentage < 5) return "groen";
-  if (percentage <= 10) return "oranje";
-  return "rood";
-}
-
-export function salarisPositieInSchaal(salaris, schaal) {
-  const range = schaal.max - schaal.min;
-  if (range === 0) return 0;
-  return Math.min(100, Math.max(0, ((salaris - schaal.min) / range) * 100));
-}
-
-export function gemiddeldeNiveau(niveau) {
-  const totaal =
-    niveau.man.aantal * niveau.man.gemiddeldSalaris +
-    niveau.vrouw.aantal * niveau.vrouw.gemiddeldSalaris;
-  const aantal = niveau.man.aantal + niveau.vrouw.aantal;
-  return Math.round(totaal / aantal);
-}
-
-export function getFunctiegroep(id) {
-  return functiegroepen.find((g) => g.id === Number(id));
-}
-
-export function authenticate(email, wachtwoord) {
-  const normalizedEmail = email.trim().toLowerCase();
-  return accounts.find(
-    (a) =>
-      a.email.trim().toLowerCase() === normalizedEmail &&
-      a.wachtwoord === wachtwoord
-  );
-}
-
-export function getMedewerkerProfiel(email) {
-  const account = accounts.find(
-    (a) => a.email === email && a.rol === "medewerker"
-  );
-  return account ?? null;
-}
-
-export const medewerkers = functiegroepen.flatMap((groep) =>
-  groep.niveaus.flatMap((niveau) => {
-    const manEntries = Array.from({ length: niveau.man.aantal }, (_, i) => ({
-      id: `${groep.id}-${niveau.id}-m-${i + 1}`,
-      functiegroep: groep.naam,
-      niveau: niveau.naam,
-      geslacht: "man",
-      salaris: niveau.man.gemiddeldSalaris,
-    }));
-    const vrouwEntries = Array.from({ length: niveau.vrouw.aantal }, (_, i) => ({
-      id: `${groep.id}-${niveau.id}-v-${i + 1}`,
-      functiegroep: groep.naam,
-      niveau: niveau.naam,
-      geslacht: "vrouw",
-      salaris: niveau.vrouw.gemiddeldSalaris,
-    }));
-    return [...manEntries, ...vrouwEntries];
-  })
-);

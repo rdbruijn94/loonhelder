@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const STORAGE_KEY = "loonhelder_user";
-
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -22,8 +20,7 @@ export default function Login() {
 
     if (normalizedEmail === "hr@demo.nl") {
       const user = { email: "hr@demo.nl", rol: "hr", naam: "HR Manager" };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      console.log("[LoonHelder] Rol na inloggen:", user.rol);
+      localStorage.setItem("loonhelder_user", JSON.stringify(user));
       navigate("/dashboard");
       return;
     }
@@ -34,8 +31,7 @@ export default function Login() {
         rol: "medewerker",
         naam: "Lisa Jansen",
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      console.log("[LoonHelder] Rol na inloggen:", user.rol);
+      localStorage.setItem("loonhelder_user", JSON.stringify(user));
       navigate("/mijn-profiel");
       return;
     }
