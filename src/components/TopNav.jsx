@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { getHomeRoute, useAuth } from "../context/AuthContext";
+import { getUser, logout } from "../utils/auth";
 
 const hrNavItems = [
   { pad: "/dashboard", label: "Dashboard" },
@@ -10,14 +10,14 @@ const hrNavItems = [
 const medewerkerNavItems = [{ pad: "/mijn-profiel", label: "Mijn profiel" }];
 
 export default function TopNav() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = getUser();
 
   if (!user) return null;
 
   const navItems = user.rol === "hr" ? hrNavItems : medewerkerNavItems;
-  const homePad = getHomeRoute(user.rol);
+  const homePad = user.rol === "hr" ? "/dashboard" : "/mijn-profiel";
 
   function handleLogout() {
     logout();

@@ -1,6 +1,5 @@
-import { Navigate } from "react-router-dom";
 import TopNav from "../components/TopNav";
-import { useAuth } from "../context/AuthContext";
+import { getUser } from "../utils/auth";
 import {
   functiegroepen,
   gemiddeldeNiveau,
@@ -9,17 +8,8 @@ import {
 } from "../data/mockdata";
 
 export default function MijnProfiel() {
-  const { user } = useAuth();
-
-  if (!user || user.rol !== "medewerker") {
-    return <Navigate to="/login" replace />;
-  }
-
+  const user = getUser() ?? { email: "medewerker@demo.nl", naam: "Lisa Jansen" };
   const profiel = getMedewerkerProfiel(user.email);
-
-  if (!profiel) {
-    return <Navigate to="/login" replace />;
-  }
 
   const groep = functiegroepen.find((g) => g.id === profiel.functiegroepId);
   const niveau = groep?.niveaus.find((n) => n.id === profiel.niveau);

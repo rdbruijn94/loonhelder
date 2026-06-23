@@ -1,34 +1,46 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { getHomeRoute, useAuth } from "../context/AuthContext";
-import { authenticate } from "../data/mockdata";
+import { useNavigate } from "react-router-dom";
+
+const STORAGE_KEY = "loonhelder_user";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { user, login } = useAuth();
   const [email, setEmail] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
   const [fout, setFout] = useState("");
-
-  if (user) {
-    return <Navigate to={getHomeRoute(user.rol)} replace />;
-  }
 
   function handleSubmit(e) {
     e.preventDefault();
     setFout("");
 
-    const account = authenticate(email.trim(), wachtwoord);
-    if (account) {
-      const sessionUser = login(account);
-      const redirectPad = getHomeRoute(sessionUser.rol);
-
-      console.log("[LoonHelder] Redirect naar:", redirectPad, "voor rol:", sessionUser.rol);
-
-      navigate(redirectPad, { replace: true });
-    } else {
+    if (wachtwoord !== "demo") {
       setFout("Onjuist e-mailadres of wachtwoord.");
+      return;
     }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (normalizedEmail === "hr@demo.nl") {
+      const user = { email: "hr@demo.nl", rol: "hr", naam: "HR Manager" };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      console.log("[LoonHelder] Rol na inloggen:", user.rol);
+      navigate("/dashboard");
+      return;
+    }
+
+    if (normalizedEmail === "medewerker@demo.nl") {
+      const user = {
+        email: "medewerker@demo.nl",
+        rol: "medewerker",
+        naam: "Lisa Jansen",
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      console.log("[LoonHelder] Rol na inloggen:", user.rol);
+      navigate("/mijn-profiel");
+      return;
+    }
+
+    setFout("Onjuist e-mailadres of wachtwoord.");
   }
 
   return (
