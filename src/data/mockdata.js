@@ -1,3 +1,9 @@
+export const organisatie = {
+  naam: "Verzekeraar De Amstel",
+  totaalMedewerkers: 18,
+  aantalFunctiegroepen: 1,
+};
+
 export const accounts = [
   {
     email: "hr@demo.nl",
@@ -55,8 +61,8 @@ export const functiegroepen = [
 
 export const compliance = {
   totaalMedewerkers: 18,
-  gemiddeldeLoonkloof: 8.4,
-  aantalFunctiegroepen: 1,
+  gemiddeldSalaris: 3840,
+  loonkloof: 8.4,
   complianceScore: 61,
   laatsteUpdate: "2026-03-01",
 };
