@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import TopNav from "../components/TopNav";
 import { functiegroepen, organisatie, seniorMedewerkers } from "../data/mockdata";
+import { generateOnderbouwingPDF } from "../utils/generatePDF";
 
 const formatter = new Intl.NumberFormat("nl-NL", {
   style: "currency",
@@ -188,7 +189,62 @@ function MedewerkerKolom({ persoon }) {
   );
 }
 
+function ExternInhoud() {
+  const senior = functiegroepen[0].niveaus.find((n) => n.niveau === "Senior");
+
+  return (
+    <div>
+      <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
+        Dit rapport is geschikt voor externe rapportage conform EU Richtlijn 2023/970.
+      </div>
+
+      <div className="kaart mt-4 overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-achtergrond">
+            <tr>
+              <th className="px-4 py-2 font-medium text-navy/60">Groep</th>
+              <th className="px-4 py-2 font-medium text-navy/60">Aantal</th>
+              <th className="px-4 py-2 font-medium text-navy/60">Gem. salaris</th>
+              <th className="hidden px-4 py-2 font-medium text-navy/60 sm:table-cell">
+                Gem. ervaring
+              </th>
+              <th className="hidden px-4 py-2 font-medium text-navy/60 md:table-cell">
+                Gem. score
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-navy/10">
+            <tr>
+              <td className="px-4 py-3 font-medium text-man">Man</td>
+              <td className="px-4 py-3">{senior?.man.aantal ?? 2}</td>
+              <td className="px-4 py-3">{formatter.format(senior?.man.gemiddeld ?? 4480)}</td>
+              <td className="hidden px-4 py-3 sm:table-cell">8 jaar</td>
+              <td className="hidden px-4 py-3 md:table-cell">4,0</td>
+            </tr>
+            <tr>
+              <td className="px-4 py-3 font-medium text-vrouw">Vrouw</td>
+              <td className="px-4 py-3">{senior?.vrouw.aantal ?? 2}</td>
+              <td className="px-4 py-3">{formatter.format(senior?.vrouw.gemiddeld ?? 3840)}</td>
+              <td className="hidden px-4 py-3 sm:table-cell">4 jaar</td>
+              <td className="hidden px-4 py-3 md:table-cell">2,8</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="mt-6 text-3xl font-bold text-navy">14,2%</p>
+      <p className="mt-2 text-sm leading-relaxed text-navy/70">
+        Senior Assurantieadviseur — man (n=2): gemiddeld €4.480 / vrouw (n=2): gemiddeld
+        €3.840. Loonverschil 14,2% verklaard door gemiddeld ervaringsverschil (8 vs 4 jaar)
+        en gemiddelde competentiescore (4,0 vs 2,8).
+      </p>
+    </div>
+  );
+}
+
 function SeniorOnderbouwingModal({ open, onClose }) {
+  const [actieveTab, setActieveTab] = useState("intern");
+
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
     return () => {
@@ -196,48 +252,95 @@ function SeniorOnderbouwingModal({ open, onClose }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) setActieveTab("intern");
+  }, [open]);
+
   if (!open) return null;
 
   const [thomas, sandra] = seniorMedewerkers;
+
+  const conclusieIntern =
+    "Het loonverschil van 14,2% is verklaarbaar op basis van ervaringsverschil (8 vs 4 jaar) en competentiescores. Thomas Bakker scoort op alle competenties niveau 4, Sandra Visser scoort op Productkennis en Probleemoplossend vermogen nog niveau 2. Dit verschil is objectief en niet gebaseerd op geslacht.";
+
+  const conclusieExtern =
+    "Loonverschil 14,2% verklaard door gemiddeld ervaringsverschil (8 vs 4 jaar) en gemiddelde competentiescore (4,0 vs 2,8). Dit verschil is objectief en niet gebaseerd op geslacht.";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 md:items-center md:p-4">
       <div className="absolute inset-0 bg-navy/50" onClick={onClose} aria-hidden="true" />
       <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-[10px] bg-white md:max-w-4xl md:rounded-[10px]">
-        <div className="sticky top-0 flex items-center justify-between border-b border-navy/10 bg-white px-4 py-4 md:px-6">
-          <div>
-            <h2 className="text-lg font-bold text-navy md:text-xl">
-              Onderbouwing loonverschil — Senior Assurantieadviseur
-            </h2>
-            <p className="mt-1 text-sm text-navy/60">
-              Automatisch gegenereerd op basis van competentie- en ervaringsdata
-            </p>
+        <div className="sticky top-0 z-10 border-b border-navy/10 bg-white">
+          <div className="flex items-center justify-between px-4 py-4 md:px-6">
+            <div>
+              <h2 className="text-lg font-bold text-navy md:text-xl">
+                Onderbouwing loonverschil — Senior Assurantieadviseur
+              </h2>
+              <p className="mt-1 text-sm text-navy/60">
+                Automatisch gegenereerd op basis van competentie- en ervaringsdata
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="ml-4 flex min-h-11 min-w-11 items-center justify-center text-2xl text-navy"
+              aria-label="Sluiten"
+            >
+              ×
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="ml-4 flex min-h-11 min-w-11 items-center justify-center text-2xl text-navy"
-            aria-label="Sluiten"
-          >
-            ×
-          </button>
+
+          <div className="flex border-t border-navy/10 px-4 md:px-6">
+            {[
+              { id: "intern", label: "Intern" },
+              { id: "extern", label: "Extern rapport" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActieveTab(tab.id)}
+                className={`min-h-11 px-4 text-sm font-medium ${
+                  actieveTab === tab.id
+                    ? "border-b-2 border-amber text-navy"
+                    : "border-b-2 border-transparent text-navy/50 hover:text-navy"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid gap-4 p-4 md:grid-cols-2 md:p-6">
-          <MedewerkerKolom persoon={thomas} />
-          <MedewerkerKolom persoon={sandra} />
-        </div>
+        <div className="p-4 md:p-6">
+          {actieveTab === "intern" ? (
+            <>
+              <div className="rounded-lg bg-[#FEF2F2] px-4 py-3 text-sm text-[#DC2626]">
+                Dit document bevat persoonsgegevens en is uitsluitend bestemd voor intern
+                gebruik door HR en directie.
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <MedewerkerKolom persoon={thomas} />
+                <MedewerkerKolom persoon={sandra} />
+              </div>
+            </>
+          ) : (
+            <ExternInhoud />
+          )}
 
-        <div className="border-t border-navy/10 p-4 md:p-6">
-          <p className="text-sm leading-relaxed text-navy/70">
-            Het loonverschil van 14,2% is verklaarbaar op basis van ervaringsverschil (8 vs 4
-            jaar) en competentiescores. Thomas Bakker scoort op alle competenties niveau 4,
-            Sandra Visser scoort op Productkennis en Probleemoplossend vermogen nog niveau 2.
-            Dit verschil is objectief en niet gebaseerd op geslacht.
-          </p>
+          <div className="mt-6 border-t border-navy/10 pt-6">
+            <h3 className="font-semibold text-navy">Conclusie</h3>
+            <p className="mt-2 text-sm leading-relaxed text-navy/70">
+              {actieveTab === "intern" ? conclusieIntern : conclusieExtern}
+            </p>
+            <span className="mt-3 inline-flex rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+              Loonverschil objectief verklaard
+            </span>
+          </div>
+
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
+              onClick={() => generateOnderbouwingPDF(actieveTab)}
               className="min-h-11 flex-1 rounded bg-amber px-4 py-3 text-sm font-semibold text-navy hover:bg-amber/90"
             >
               Download als PDF
