@@ -1,5 +1,8 @@
 import TopNav from "../components/TopNav";
-import { medewerker } from "../data/mockdata";
+import FunctieprofielSectie from "../components/FunctieprofielSectie";
+import CompetentiehandboekSectie from "../components/CompetentiehandboekSectie";
+import GesprekkenSectie from "../components/GesprekkenSectie";
+import { medewerker, getGesprekkenVoorMedewerker } from "../data/mockdata";
 
 const formatter = new Intl.NumberFormat("nl-NL", {
   style: "currency",
@@ -161,6 +164,11 @@ export default function MijnProfiel() {
           </p>
         </section>
 
+        <div className="mt-4 space-y-4 md:mt-6">
+          <FunctieprofielSectie niveau="Medior" />
+          <CompetentiehandboekSectie competenties={medewerker.competenties} />
+        </div>
+
         <section className="mt-6 md:mt-8">
           <h2 className="text-base font-semibold text-navy md:text-lg">Jouw competenties</h2>
           <p className="mt-1 text-sm text-navy/60">
@@ -196,6 +204,14 @@ export default function MijnProfiel() {
             </div>
           </section>
         )}
+
+        <div className="mt-6 md:mt-8">
+          <GesprekkenSectie
+            medewerkerId={11}
+            gevoerdeGesprekken={getGesprekkenVoorMedewerker(11)}
+            isHR={false}
+          />
+        </div>
 
         <div className="mt-6 rounded-[10px] bg-navy p-6 text-white md:mt-8 md:p-8">
           <h2 className="text-lg font-semibold md:text-xl">Bespreek je ontwikkeling</h2>

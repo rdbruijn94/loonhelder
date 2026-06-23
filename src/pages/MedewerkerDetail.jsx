@@ -1,6 +1,11 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import TopNav from "../components/TopNav";
+import FunctieprofielSectie from "../components/FunctieprofielSectie";
+import CompetentiehandboekSectie from "../components/CompetentiehandboekSectie";
+import GesprekkenSectie from "../components/GesprekkenSectie";
+import MedewerkerDocumenten from "../components/MedewerkerDocumenten";
+import { getUser } from "../utils/auth";
 import {
   alleMedewerkers,
   gemCompetentieScore,
@@ -191,16 +196,10 @@ export default function MedewerkerDetail() {
   const [salarisFout, setSalarisFout] = useState("");
   const [loonkloofWaarschuwing, setLoonkloofWaarschuwing] = useState(false);
 
-  const [nieuwGesprekOpen, setNieuwGesprekOpen] = useState(false);
-  const [gesprekDraft, setGesprekDraft] = useState({
-    datum: "",
-    type: "doelen",
-    notities: "",
-    doelen: [""],
-  });
-  const [gesprekVerslag, setGesprekVerslag] = useState(null);
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [competentiesOpgeslagen, setCompetentiesOpgeslagen] = useState(false);
+
+  const isHR = getUser()?.rol === "hr";
 
   useEffect(() => {
     if (!bron) return;
@@ -288,37 +287,6 @@ export default function MedewerkerDetail() {
     setTimeout(() => setCompetentiesOpgeslagen(false), 2500);
   }
 
-  function voegDoelToe() {
-    setGesprekDraft((d) => ({ ...d, doelen: [...d.doelen, ""] }));
-  }
-
-  function updateDoel(i, waarde) {
-    setGesprekDraft((d) => ({
-      ...d,
-      doelen: d.doelen.map((doel, idx) => (idx === i ? waarde : doel)),
-    }));
-  }
-
-  function slaGesprekOp() {
-    const typeLabel =
-      gesprekDraft.type === "doelen"
-        ? "Doelengesprek"
-        : gesprekDraft.type === "ontwikkeling"
-          ? "Ontwikkelgesprek"
-          : "Beoordelingsgesprek";
-    const nieuw = {
-      id: Date.now(),
-      medewerkerId: profiel.id,
-      type: typeLabel,
-      datum: gesprekDraft.datum,
-      samenvatting: gesprekDraft.notities || "Geen samenvatting ingevuld.",
-      doelen: gesprekDraft.doelen.filter(Boolean),
-    };
-    setGesprekkenLijst((prev) => [nieuw, ...prev]);
-    setNieuwGesprekOpen(false);
-    setGesprekDraft({ datum: "", type: "doelen", notities: "", doelen: [""] });
-  }
-
   const p = profielBewerken ? profielDraft : profiel;
 
   return (
@@ -331,31 +299,6 @@ export default function MedewerkerDetail() {
         salaris={salaris}
         competenties={competenties}
       />
-
-      {gesprekVerslag && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-navy/50" onClick={() => setGesprekVerslag(null)} />
-          <div className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-[10px] bg-white p-6">
-            <h3 className="font-bold text-navy">{gesprekVerslag.type}</h3>
-            <p className="mt-1 text-sm text-navy/60">{formatDatum(gesprekVerslag.datum)}</p>
-            <p className="mt-4 text-sm text-navy/70">{gesprekVerslag.samenvatting}</p>
-            {gesprekVerslag.doelen?.length > 0 && (
-              <ul className="mt-4 list-inside list-disc text-sm text-navy/70">
-                {gesprekVerslag.doelen.map((d) => (
-                  <li key={d}>{d}</li>
-                ))}
-              </ul>
-            )}
-            <button
-              type="button"
-              onClick={() => setGesprekVerslag(null)}
-              className="mt-6 min-h-11 w-full rounded bg-navy text-sm text-white"
-            >
-              Sluiten
-            </button>
-          </div>
-        </div>
-      )}
 
       <main className="inhoud">
         <nav className="text-sm text-navy/60">
@@ -559,6 +502,10 @@ export default function MedewerkerDetail() {
               </div>
             </section>
 
+            <FunctieprofielSectie niveau={profiel.niveau} />
+
+            <CompetentiehandboekSectie competenties={competenties} />
+
             {/* Sectie 3 — Competenties */}
             <section>
               <h2 className="text-base font-semibold text-navy md:text-lg">Competentieprofiel</h2>
@@ -620,103 +567,11 @@ export default function MedewerkerDetail() {
               </button>
             </section>
 
-            {/* Sectie 4 — Gesprekken */}
-            <section className="kaart p-4 md:p-6">
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-base font-semibold text-navy md:text-lg">Gesprekshistorie</h2>
-                <button
-                  type="button"
-                  onClick={() => setNieuwGesprekOpen(!nieuwGesprekOpen)}
-                  className="min-h-11 rounded bg-navy px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Nieuw gesprek vastleggen
-                </button>
-              </div>
-
-              {nieuwGesprekOpen && (
-                <div className="mt-4 space-y-3 rounded-lg bg-achtergrond p-4">
-                  <div>
-                    <label className="text-sm text-navy/70">Datum</label>
-                    <input
-                      type="date"
-                      value={gesprekDraft.datum}
-                      onChange={(e) => setGesprekDraft((d) => ({ ...d, datum: e.target.value }))}
-                      className="mt-1 w-full rounded border border-navy/20 px-3 py-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm text-navy/70">Type</label>
-                    <select
-                      value={gesprekDraft.type}
-                      onChange={(e) => setGesprekDraft((d) => ({ ...d, type: e.target.value }))}
-                      className="mt-1 w-full rounded border border-navy/20 px-3 py-2"
-                    >
-                      <option value="doelen">Doelen</option>
-                      <option value="ontwikkeling">Ontwikkeling</option>
-                      <option value="beoordeling">Beoordeling</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-navy/70">Notities</label>
-                    <textarea
-                      value={gesprekDraft.notities}
-                      onChange={(e) =>
-                        setGesprekDraft((d) => ({ ...d, notities: e.target.value }))
-                      }
-                      rows={3}
-                      className="mt-1 w-full rounded border border-navy/20 px-3 py-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm text-navy/70">Doelen</label>
-                    {gesprekDraft.doelen.map((doel, i) => (
-                      <input
-                        key={i}
-                        value={doel}
-                        onChange={(e) => updateDoel(i, e.target.value)}
-                        placeholder={`Doel ${i + 1}`}
-                        className="mt-1 w-full rounded border border-navy/20 px-3 py-2"
-                      />
-                    ))}
-                    <button
-                      type="button"
-                      onClick={voegDoelToe}
-                      className="mt-2 text-sm text-amber"
-                    >
-                      + Doel toevoegen
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={slaGesprekOp}
-                    className="min-h-11 rounded bg-navy px-4 py-2 text-sm text-white"
-                  >
-                    Opslaan
-                  </button>
-                </div>
-              )}
-
-              <div className="mt-4 divide-y divide-navy/10">
-                {gesprekkenLijst.map((g) => (
-                  <div key={g.id} className="py-4 first:pt-0">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <p className="font-medium text-navy">{g.type}</p>
-                        <p className="text-xs text-navy/50">{formatDatum(g.datum)}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setGesprekVerslag(g)}
-                        className="min-h-11 rounded bg-navy/10 px-3 py-1.5 text-xs font-medium text-navy"
-                      >
-                        Bekijk verslag
-                      </button>
-                    </div>
-                    <p className="mt-2 text-sm text-navy/70">{g.samenvatting}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            <GesprekkenSectie
+              medewerkerId={profiel.id}
+              gevoerdeGesprekken={gesprekkenLijst}
+              isHR={isHR}
+            />
           </div>
 
           {/* Rechterkolom */}
@@ -745,6 +600,8 @@ export default function MedewerkerDetail() {
                 </button>
               </div>
             </div>
+
+            <MedewerkerDocumenten medewerkerId={profiel.id} />
 
             <div className="kaart p-4">
               <h3 className="font-semibold text-navy">Compliance-status</h3>

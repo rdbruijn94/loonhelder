@@ -379,3 +379,68 @@ export function generateMedewerkerPDF(medewerker) {
   const slug = medewerker.naam.replace(/\s+/g, "_");
   doc.save(`LoonHelder_Onderbouwing_${slug}_${datum}.pdf`);
 }
+
+export function generateFunctieprofielPDF(profiel) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  drawHeader(doc);
+
+  let y = HEADER_H + 12;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(...NAVY);
+  doc.text("Functieprofiel", MARGIN, y);
+
+  y += 10;
+  doc.setFontSize(12);
+  doc.text(profiel.functietitel, MARGIN, y);
+  y += 8;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+
+  const velden = [
+    ["Afdeling", profiel.afdeling],
+    ["Rapporteert aan", profiel.rapporteertAan],
+    ["Vereiste opleiding", profiel.opleiding],
+    ["Vereiste ervaring", profiel.ervaring],
+  ];
+
+  velden.forEach(([label, waarde]) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(`${label}:`, MARGIN, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(waarde, MARGIN + 40, y);
+    y += 6;
+  });
+
+  y += 4;
+  doc.setFont("helvetica", "bold");
+  doc.text("Doel van de functie:", MARGIN, y);
+  y += 6;
+  doc.setFont("helvetica", "normal");
+  const doelLines = doc.splitTextToSize(profiel.doel, CONTENT_W);
+  doc.text(doelLines, MARGIN, y);
+  y += doelLines.length * 5 + 6;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Taken en verantwoordelijkheden:", MARGIN, y);
+  y += 6;
+  doc.setFont("helvetica", "normal");
+  profiel.taken.forEach((taak) => {
+    doc.text(`• ${taak}`, MARGIN + 2, y);
+    y += 5;
+  });
+
+  y += 4;
+  doc.setFont("helvetica", "bold");
+  doc.text("Competenties:", MARGIN, y);
+  y += 6;
+  doc.setFont("helvetica", "normal");
+  doc.text(profiel.competenties.join(", "), MARGIN, y);
+
+  drawFooter(doc, 1, 1);
+
+  const datum = datumBestand();
+  doc.save(`LoonHelder_Functieprofiel_${datum}.pdf`);
+}

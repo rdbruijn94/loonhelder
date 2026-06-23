@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import TopNav from "../components/TopNav";
+import FunctiegroepDocumenten from "../components/FunctiegroepDocumenten";
 import { functiegroepen, organisatie, seniorMedewerkers } from "../data/mockdata";
 import { generateOnderbouwingPDF } from "../utils/generatePDF";
 
@@ -516,6 +517,7 @@ export default function Functiegroep() {
                 }
               />
             ))}
+            <FunctiegroepDocumenten />
           </div>
           <div className="order-2 lg:order-2">
             <Zijbalk groep={groep} />
