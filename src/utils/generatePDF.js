@@ -329,3 +329,53 @@ export function generateOnderbouwingPDF(type) {
 
   doc.save(filename);
 }
+
+export function generateMedewerkerPDF(medewerker) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  drawHeader(doc);
+
+  let y = HEADER_H + 12;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(...NAVY);
+  doc.text("Onderbouwingsdocument medewerker", MARGIN, y);
+
+  y += 10;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(medewerker.naam, MARGIN, y);
+  y += 7;
+  doc.setFontSize(10);
+  doc.text(`${medewerker.functie} · ${euro(medewerker.salaris)}`, MARGIN, y);
+  y += 6;
+  doc.text(`Ervaringsjaren: ${medewerker.ervaringsjaren}`, MARGIN, y);
+  y += 6;
+  doc.text(`Beoordeling: ${medewerker.beoordelingResultaat}`, MARGIN, y);
+  y += 6;
+  doc.text(`Competentiescore: ${gemCompetentie(medewerker)}`, MARGIN, y);
+
+  y += 10;
+  doc.setFont("helvetica", "bold");
+  doc.text("Competenties:", MARGIN, y);
+  y += 6;
+  doc.setFont("helvetica", "normal");
+  medewerker.competenties.forEach((c) => {
+    doc.text(`${c.naam}: niveau ${c.huidigNiveau}`, MARGIN, y);
+    y += 5;
+  });
+
+  y += 6;
+  doc.setFillColor(240, 253, 244);
+  doc.rect(MARGIN, y - 4, CONTENT_W, 10, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...GROEN);
+  doc.text("Salarispositie objectief onderbouwd", MARGIN + 2, y + 3);
+
+  drawFooter(doc, 1, 1);
+
+  const datum = datumBestand();
+  const slug = medewerker.naam.replace(/\s+/g, "_");
+  doc.save(`LoonHelder_Onderbouwing_${slug}_${datum}.pdf`);
+}

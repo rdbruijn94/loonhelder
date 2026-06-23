@@ -5,6 +5,7 @@ import { getUser, logout } from "../utils/auth";
 const hrNavItems = [
   { pad: "/dashboard", label: "Dashboard" },
   { pad: "/functiegroepen", label: "Functiegroepen", prefix: true },
+  { pad: "/medewerkers", label: "Medewerkers", prefix: true },
   { pad: "/onboarding", label: "Scan" },
 ];
 
