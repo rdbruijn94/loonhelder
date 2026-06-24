@@ -51,9 +51,8 @@ export async function generateFunctieprofielPDF({
 }) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const [pr, pg, pb] = hexToRgb(primairKleur || "#1B2E4B");
-  const sectionPages = {};
 
-  function drawHeader(pageNum) {
+  function drawHeader() {
     if (logoDataURL) {
       try {
         doc.addImage(logoDataURL, "PNG", MARGIN, 8, 24, 12);
@@ -88,7 +87,7 @@ export async function generateFunctieprofielPDF({
     doc.text(String(pageNum), PAGE_W / 2, footerY + 8, { align: "center" });
   }
 
-  drawHeader(1);
+  drawHeader();
   let y = 32;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
@@ -111,12 +110,11 @@ export async function generateFunctieprofielPDF({
 
   SECTIONS.forEach((s, i) => {
     doc.text(`${i + 1}. ${s.label}`, MARGIN + 2, y);
-    doc.text("...", PAGE_W - MARGIN - 20, y);
     y += 6;
   });
 
   doc.addPage();
-  drawHeader(2);
+  drawHeader();
   y = 32;
 
   SECTIONS.forEach((section) => {
@@ -126,11 +124,9 @@ export async function generateFunctieprofielPDF({
 
     if (y + needed > PAGE_H - FOOTER_H - 10) {
       doc.addPage();
-      drawHeader(doc.getNumberOfPages());
+      drawHeader();
       y = 32;
     }
-
-    sectionPages[section.key] = doc.getNumberOfPages();
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
@@ -138,11 +134,7 @@ export async function generateFunctieprofielPDF({
     doc.text(section.label, MARGIN, y);
     y += 7;
 
-    doc.setDrawColor(
-      Math.round(pr + (255 - pr) * 0.8),
-      Math.round(pg + (255 - pg) * 0.8),
-      Math.round(pb + (255 - pb) * 0.8)
-    );
+    doc.setDrawColor(pr, pg, pb);
     doc.setLineWidth(0.3);
     doc.line(MARGIN, y, PAGE_W - MARGIN, y);
     y += 5;
@@ -155,17 +147,6 @@ export async function generateFunctieprofielPDF({
   });
 
   const totalPages = doc.getNumberOfPages();
-  doc.setPage(1);
-  y = 32 + 28;
-  SECTIONS.forEach((s, i) => {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
-    doc.text(`${i + 1}. ${s.label}`, MARGIN + 2, y);
-    doc.setTextColor(pr, pg, pb);
-    doc.text(String(sectionPages[s.key] || 2), PAGE_W - MARGIN - 10, y, { align: "right" });
-    y += 6;
-  });
 
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
