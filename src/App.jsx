@@ -8,6 +8,7 @@ import Medewerkers from "./pages/Medewerkers";
 import MedewerkerDetail from "./pages/MedewerkerDetail";
 import Onboarding from "./pages/Onboarding";
 import Resultaten from "./pages/Resultaten";
+import FunctieprofielWizard from "./pages/FunctieprofielWizard";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
       <Route path="/medewerkers/:id" element={<MedewerkerDetail />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/resultaten" element={<Resultaten />} />
+      <Route path="/functieprofiel-wizard" element={<FunctieprofielWizard />} />
       <Route path="/functiegroep" element={<Navigate to="/functiegroepen/1" replace />} />
     </Routes>
   );

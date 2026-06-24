@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import TopNav from "../components/TopNav";
 import { berekenRapport, getScanAntwoorden } from "../utils/scan";
 
@@ -17,9 +17,26 @@ const statusStyles = {
   },
 };
 
+function ActieKnop({ item, className, onClick }) {
+  if (item.status === "groen") return null;
+  const label = item.status === "rood" ? item.actieRood : item.actieOranje;
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {label}
+    </button>
+  );
+}
+
 export default function Resultaten() {
+  const navigate = useNavigate();
   const antwoorden = getScanAntwoorden();
   const { onderdelen, telling } = berekenRapport(antwoorden);
+
+  function handleActie(item) {
+    if (item.id === "functiebeschrijvingen") {
+      navigate("/functieprofiel-wizard");
+    }
+  }
 
   return (
     <div className="pagina">
@@ -56,22 +73,11 @@ export default function Resultaten() {
                 {statusStyles[item.status].label}
               </span>
               <div className="mt-3">
-                {item.status === "rood" && (
-                  <button
-                    type="button"
-                    className="min-h-11 w-full rounded bg-navy px-4 py-2 text-sm font-medium text-white"
-                  >
-                    {item.actieRood}
-                  </button>
-                )}
-                {item.status === "oranje" && (
-                  <button
-                    type="button"
-                    className="min-h-11 w-full rounded bg-navy px-4 py-2 text-sm font-medium text-white"
-                  >
-                    {item.actieOranje}
-                  </button>
-                )}
+                <ActieKnop
+                  item={item}
+                  onClick={() => handleActie(item)}
+                  className="min-h-11 w-full rounded bg-navy px-4 py-2 text-sm font-medium text-white"
+                />
               </div>
             </div>
           ))}
@@ -98,22 +104,11 @@ export default function Resultaten() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    {item.status === "rood" && (
-                      <button
-                        type="button"
-                        className="min-h-11 rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
-                      >
-                        {item.actieRood}
-                      </button>
-                    )}
-                    {item.status === "oranje" && (
-                      <button
-                        type="button"
-                        className="min-h-11 rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
-                      >
-                        {item.actieOranje}
-                      </button>
-                    )}
+                    <ActieKnop
+                      item={item}
+                      onClick={() => handleActie(item)}
+                      className="min-h-11 rounded bg-navy px-4 py-2 text-xs font-medium text-white hover:bg-navy/90"
+                    />
                   </td>
                 </tr>
               ))}
@@ -131,6 +126,7 @@ export default function Resultaten() {
           </p>
           <button
             type="button"
+            onClick={() => navigate("/functieprofiel-wizard")}
             className="mt-6 min-h-11 w-full rounded bg-amber px-6 py-3 text-sm font-semibold text-navy hover:bg-amber/90 md:w-auto md:py-2.5"
           >
             Bekijk wat AI kan genereren
