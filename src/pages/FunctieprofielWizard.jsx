@@ -67,6 +67,7 @@ export default function FunctieprofielWizard() {
   const [logoDataURL, setLogoDataURL] = useState("");
   const [primairKleur, setPrimairKleur] = useState("");
   const [kleurHandmatig, setKleurHandmatig] = useState(false);
+  const [logoFout, setLogoFout] = useState("");
   const [organisatienaam, setOrganisatienaam] = useState(organisatie.naam);
   const [functies, setFuncties] = useState([]);
   const [nieuweFunctie, setNieuweFunctie] = useState("");
@@ -99,6 +100,11 @@ export default function FunctieprofielWizard() {
 
   async function handleLogoUpload(file) {
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoFout("Bestand is groter dan 2MB.");
+      return;
+    }
+    setLogoFout("");
     const reader = new FileReader();
     reader.onload = async () => {
       const dataUrl = reader.result;
@@ -112,6 +118,12 @@ export default function FunctieprofielWizard() {
       }
     };
     reader.readAsDataURL(file);
+  }
+
+  function verwijderLogo() {
+    setLogoDataURL("");
+    setLogoFout("");
+    if (!kleurHandmatig) setPrimairKleur("");
   }
 
   function voegFunctieToe() {
@@ -308,16 +320,65 @@ export default function FunctieprofielWizard() {
             </div>
 
             <div className="mt-4">
-              <label className="text-sm font-medium text-navy">Logo uploaden</label>
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/svg+xml,.png,.jpg,.jpeg,.svg"
-                onChange={(e) => handleLogoUpload(e.target.files?.[0])}
-                className="mt-1 w-full text-sm"
-              />
-              {logoDataURL && (
-                <img src={logoDataURL} alt="Logo preview" className="mt-3 h-16 object-contain" />
-              )}
+              <p className="text-sm font-medium text-navy">Logo uploaden</p>
+              <div className="relative mt-2">
+                <label
+                  className={`flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-6 transition-colors ${
+                    logoDataURL
+                      ? "border-navy/20 bg-white"
+                      : "border-navy/30 bg-achtergrond hover:border-navy/50 hover:bg-white"
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml,.png,.jpg,.jpeg,.svg"
+                    className="hidden"
+                    onChange={(e) => {
+                      handleLogoUpload(e.target.files?.[0]);
+                      e.target.value = "";
+                    }}
+                  />
+                  {logoDataURL ? (
+                    <img
+                      src={logoDataURL}
+                      alt="Logo preview"
+                      className="max-h-24 max-w-full object-contain"
+                    />
+                  ) : (
+                    <>
+                      <svg
+                        className="h-10 w-10 text-navy/40"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                        />
+                      </svg>
+                      <p className="mt-3 text-sm font-medium text-navy">
+                        Klik om een logo te uploaden
+                      </p>
+                      <p className="mt-1 text-xs text-navy/50">PNG, JPG of SVG — max 2MB</p>
+                    </>
+                  )}
+                </label>
+                {logoDataURL && (
+                  <button
+                    type="button"
+                    onClick={verwijderLogo}
+                    className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg text-navy/60 shadow ring-1 ring-navy/10 hover:text-[#DC2626]"
+                    aria-label="Logo verwijderen"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              {logoFout && <p className="mt-2 text-sm text-[#DC2626]">{logoFout}</p>}
             </div>
 
             {(primairKleur || kleurHandmatig) && (
@@ -360,7 +421,11 @@ export default function FunctieprofielWizard() {
               type="button"
               disabled={!stap1Klaar}
               onClick={() => setStap(2)}
-              className="mt-6 min-h-11 rounded bg-navy px-6 py-2 text-sm font-medium text-white disabled:opacity-40"
+              className={`mt-6 min-h-11 rounded px-6 py-2 text-sm font-medium ${
+                stap1Klaar
+                  ? "cursor-pointer bg-navy text-white"
+                  : "cursor-not-allowed bg-[#D1D5DB] text-[#9CA3AF]"
+              }`}
             >
               Volgende stap
             </button>
